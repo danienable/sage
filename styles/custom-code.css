@@ -1,0 +1,283 @@
+/****************
+    SIDEBAR A
+****************/
+
+/* Default (before JS): treat as logged out */
+.js-enroll-native,
+.course-purchase__mobile-button,
+.entitlement-gate,
+.js-entitlement-gate {
+  display: none !important;
+}
+
+.js-enroll-anon,
+.anon-enroll {
+  display: block;
+}
+
+/* Sidebar A: logged out only */
+html.is-logged-in .anon-enroll,
+html.is-logged-in .js-enroll-anon {
+  display: none !important;
+}
+
+html.is-anonymous .js-enroll-native,
+html.is-anonymous .course-purchase__mobile-button,
+html.is-anonymous .entitlement-gate,
+html.is-anonymous .js-entitlement-gate {
+  display: none !important;
+}
+
+/* Sidebar C: logged in, no entitlement, not purchasable */
+html.is-logged-in.course-state-ready.no-course-access:not(.course-purchasable) .entitlement-gate,
+html.is-logged-in.course-state-ready.no-course-access:not(.course-purchasable) .js-entitlement-gate {
+  display: block !important;
+}
+
+html.is-logged-in.course-state-ready.no-course-access:not(.course-purchasable) .js-enroll-native,
+html.is-logged-in.course-state-ready.no-course-access:not(.course-purchasable) .course-purchase__mobile-button {
+  display: none !important;
+}
+
+/* Native widget: Start (has access) or Enroll (course is purchasable) */
+html.is-logged-in.has-course-access .js-enroll-native,
+html.is-logged-in.has-course-access .course-purchase__mobile-button,
+html.is-logged-in.course-purchasable .js-enroll-native,
+html.is-logged-in.course-purchasable .course-purchase__mobile-button {
+  display: block !important;
+}
+
+.anon-enroll {
+  --anon-bg: #e7f0e4;
+  --anon-green: #2f5c32;
+  --anon-text: #111;
+
+  box-sizing: border-box;
+  background: var(--anon-bg);
+  border-radius: 16px;
+  padding: 32px 28px;
+  color: var(--anon-text);
+  font-family: arial, helvetica, sans-serif;
+}
+
+.anon-enroll__heading {
+  margin: 0 0 10px;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--anon-text);
+}
+
+.anon-enroll__intro {
+  margin: 0 0 28px;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.45;
+  color: var(--anon-text);
+}
+
+.anon-enroll__item {
+  display: block;
+  padding: 16px 0;
+  text-decoration: none;
+  color: inherit;
+  border-bottom: 1px solid var(--anon-green);
+}
+
+.anon-enroll__item:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.anon-enroll__item-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--anon-green);
+}
+
+.anon-enroll__item-title::after {
+  content: "";
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  background-color: currentcolor;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12h14M13 6l6 6-6 6'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+.anon-enroll__item-desc {
+  display: block;
+  margin-top: 6px;
+  font-size: 15px;
+  font-style: italic;
+  font-weight: 400;
+  line-height: 1.45;
+  color: var(--anon-text);
+}
+
+.anon-enroll__item:hover .anon-enroll__item-title {
+  text-decoration: underline;
+}
+
+/***********************
+       SIDEBAR C
+***********************/
+
+.entitlement-gate {
+  --anon-bg: #e7f0e4;
+  --anon-text: #111;
+  --anon-border: #c2d0bc;
+
+  display: none;
+  box-sizing: border-box;
+  background: var(--anon-bg);
+  border: 1px solid var(--anon-border);
+  border-radius: 16px;
+  padding: 32px 28px;
+  color: var(--anon-text);
+  font-family: arial, helvetica, sans-serif;
+}
+
+html.is-logged-in.no-course-access:not(.course-purchasable) .entitlement-gate,
+html.is-logged-in.no-course-access:not(.course-purchasable) .js-entitlement-gate {
+  display: block;
+}
+
+html.is-logged-in.no-course-access:not(.course-purchasable) .js-enroll-native,
+html.is-logged-in.no-course-access:not(.course-purchasable) .course-purchase__mobile-button {
+  display: none !important;
+}
+
+.entitlement-gate__heading {
+  margin: 0 0 12px;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--anon-text);
+}
+
+.entitlement-gate__body,
+.entitlement-gate__note {
+  margin: 0 0 16px;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.45;
+  color: var(--anon-text);
+}
+
+.entitlement-gate__note {
+  margin-bottom: 0;
+}
+
+.entitlement-gate__link {
+  color: inherit;
+  font-weight: 700;
+  text-decoration: none !important;
+}
+
+/***********************
+  COURSE VIEWER ICONS
+***********************/
+
+/* Hide the default list marker circle */
+li.syllabus__topic--non-expandable::before {
+  content: none;
+}
+
+/* Add the type icon */
+.syllabus__topic[data-page-type] .syllabus__topic--non-expandable-title-text::before {
+  content: "";
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
+  vertical-align: middle;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+.syllabus__topic[data-page-type="text"] .syllabus__topic--non-expandable-title-text::before {
+  background-image: url("https://sageu.com/global/images/rebrand/Icons/Icons/UI_Icons/edit_black.png");
+}
+
+.syllabus__topic[data-page-type="video"] .syllabus__topic--non-expandable-title-text::before {
+  background-image: url("https://sageu.com/global/images/rebrand/Icons/Icons/UI_Icons/cinema_black.png");
+}
+
+.syllabus__topic[data-page-type="quiz"] .syllabus__topic--non-expandable-title-text::before {
+  background-image: url("https://sageu.com/global/images/rebrand/Icons/Icons/UI_Icons/flash_on_black.png");
+}
+
+.syllabus__topic[data-page-type="listRoll"] .syllabus__topic--non-expandable-title-text::before {
+  background-image: url("https://sageu.com/global/images/rebrand/Icons/Icons/UI_Icons/list_black.png");
+}
+
+.syllabus__topic[data-page-type="recipe"] .syllabus__topic--non-expandable-title-text::before {
+  background-image: url("https://sageu.com/global/images/rebrand/Icons/Icons/UI_Icons/bayleaf_black.png");
+}
+
+.syllabus__topic[data-page-type="tally"] .syllabus__topic--non-expandable-title-text::before {
+  background-image: url("https://sageu.com/global/images/rebrand/Icons/Icons/UI_Icons/double_tick_black.png");
+}
+
+.syllabus__topic[data-page-type="highlightZoneSet"] .syllabus__topic--non-expandable-title-text::before {
+  background-image: url("https://sageu.com/global/images/rebrand/Icons/Icons/UI_Icons/grid_black.png");
+}
+
+/****************
+    CATALOG
+****************/
+.custom-catalog li .catalog-grid-item {
+    border-radius: 16px;
+    overflow: hidden;
+    border: none;
+    box-shadow: 0 4px 12px rgb(0 0 0 / 8%);
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+.custom-catalog p.catalog-grid-item__title {
+    min-height: unset;
+    text-align: left;
+}
+
+
+/***********************
+  SAGE CONTAINER
+***********************/
+
+
+.sage-container {
+  margin-right: auto;
+  margin-left: auto;
+  padding-left: 15px;
+  padding-right: 15px; }
+
+.sage-container::before, .sage-container::after {
+    content: " ";
+    display: table; }
+
+.sage-container::after {
+    clear: both; }
+
+ @media (width >= 768px) {
+    .sage-container {
+      width: 750px; } }
+
+ @media (width >= 1080px) {
+    .sage-container {
+      width: 970px; } }
+
+ @media (width >= 1680px) {
+    .sage-container {
+      width: 1170px; } }
