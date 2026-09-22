@@ -7,6 +7,9 @@
 node_modules/
 dist/
 
+# IDE Artifacts
+.vscode/
+
 # Compiled Java class files
 *.class
 
@@ -47,4 +50,3 @@ Thumbs.db
 *.flv
 *.mov
 *.wmv
-
