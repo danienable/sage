@@ -79,7 +79,7 @@
     setText(root.querySelector(".entitlement-gate__heading"), t.heading);
     setText(root.querySelector(".entitlement-gate__body"), t.body);
     setText(root.querySelector(".entitlement-gate__note-before"), t.noteBefore);
-    setText(root.querySelector(".entitlement-gate__link"), t.link);
+    setText(root.querySelector(".entitlement-gate__note strong"), t.link);
     setText(root.querySelector(".entitlement-gate__note-after"), t.noteAfter);
     return true;
   }

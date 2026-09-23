@@ -173,12 +173,6 @@ html.is-logged-in.no-course-access:not(.course-purchasable) .course-purchase__mo
   margin-bottom: 0;
 }
 
-.entitlement-gate__link {
-  color: inherit;
-  font-weight: 700;
-  text-decoration: none !important;
-}
-
 /***********************
   COURSE VIEWER ICONS
 ***********************/
