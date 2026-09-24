@@ -281,3 +281,26 @@ li.syllabus__topic--non-expandable::before {
  @media (width >= 1680px) {
     .sage-container {
       width: 1170px; } }
+
+/***********************
+  ENTITLEMENT ACK
+***********************/
+
+.entitlement-ack {
+  margin: 0;
+  padding: 8px 16px;
+  background-color: #007776;
+  color: #fff;
+  font-family: arial, helvetica, sans-serif;
+  font-size: 14px;
+  line-height: 1.3;
+  text-align: center;
+}
+
+.entitlement-ack__text {
+  margin: 0;
+}
+
+.entitlement-ack__text + .entitlement-ack__text {
+  margin-top: 4px;
+}

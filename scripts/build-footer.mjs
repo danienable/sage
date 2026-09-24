@@ -6,6 +6,7 @@ const outFile = path.resolve("dist/tracking-scripts.html");
 
 const files = [
   "mark-auth.js",
+  "entitlement-ack.js",
   "anon-enroll-i18n.js",
   "mark-course.js",
   "entitlement-gate-i18n.js",
