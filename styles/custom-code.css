@@ -5,6 +5,7 @@
 /* Default (before JS): treat as logged out */
 .js-enroll-native,
 .course-purchase__mobile-button,
+.widget--learning-path-purchase,
 .entitlement-gate,
 .js-entitlement-gate {
   display: none !important;
@@ -23,6 +24,7 @@ html.is-logged-in .js-enroll-anon {
 
 html.is-anonymous .js-enroll-native,
 html.is-anonymous .course-purchase__mobile-button,
+html.is-anonymous .widget--learning-path-purchase,
 html.is-anonymous .entitlement-gate,
 html.is-anonymous .js-entitlement-gate {
   display: none !important;
@@ -35,15 +37,18 @@ html.is-logged-in.course-state-ready.no-course-access:not(.course-purchasable) .
 }
 
 html.is-logged-in.course-state-ready.no-course-access:not(.course-purchasable) .js-enroll-native,
-html.is-logged-in.course-state-ready.no-course-access:not(.course-purchasable) .course-purchase__mobile-button {
+html.is-logged-in.course-state-ready.no-course-access:not(.course-purchasable) .course-purchase__mobile-button,
+html.is-logged-in.course-state-ready.no-course-access:not(.course-purchasable) .widget--learning-path-purchase {
   display: none !important;
 }
 
 /* Native widget: Start (has access) or Enroll (course is purchasable) */
 html.is-logged-in.has-course-access .js-enroll-native,
 html.is-logged-in.has-course-access .course-purchase__mobile-button,
+html.is-logged-in.has-course-access .widget--learning-path-purchase,
 html.is-logged-in.course-purchasable .js-enroll-native,
-html.is-logged-in.course-purchasable .course-purchase__mobile-button {
+html.is-logged-in.course-purchasable .course-purchase__mobile-button,
+html.is-logged-in.course-purchasable .widget--learning-path-purchase {
   display: block !important;
 }
 
@@ -148,7 +153,8 @@ html.is-logged-in.no-course-access:not(.course-purchasable) .js-entitlement-gate
 }
 
 html.is-logged-in.no-course-access:not(.course-purchasable) .js-enroll-native,
-html.is-logged-in.no-course-access:not(.course-purchasable) .course-purchase__mobile-button {
+html.is-logged-in.no-course-access:not(.course-purchasable) .course-purchase__mobile-button,
+html.is-logged-in.no-course-access:not(.course-purchasable) .widget--learning-path-purchase {
   display: none !important;
 }
 
