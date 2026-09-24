@@ -30,13 +30,14 @@
   function markCourse() {
     var root = document.documentElement;
     var loggedIn = root.classList.contains("is-logged-in");
-    var widget = document.querySelector(".js-enroll-native");
+    var widget = document.querySelector(".js-enroll-native, .enroll--learning-path");
     var view = getView(widget);
     var text = widget ? (widget.textContent || "").toLowerCase() : "";
 
     var purchasable = read(view, [
       "purchasable",
       "course.purchasable",
+      "learningPath.purchasable",
       "content.purchasable",
       "model.purchasable"
     ]);
@@ -44,6 +45,7 @@
       "hasAccess",
       "currentUserHasAccess",
       "course.currentUserHasAccess",
+      "learningPath.currentUserHasAccess",
       "isEnrolled",
       "hasEnrollment",
       "enrolled",
@@ -53,7 +55,7 @@
 
     if (purchasable === null) {
       purchasable = !!document.querySelector(
-        ".js-enroll-native .enroll__price, .js-enroll-native .course-purchase__price"
+        ".js-enroll-native .enroll__price, .js-enroll-native .course-purchase__price, .enroll--learning-path .enroll__price"
       );
     }
 
@@ -69,7 +71,7 @@
       (purchasable === true ||
         hasAccess === true ||
         (text && text.replace(/\s+/g, " ").trim().length > 15) ||
-        document.querySelector(".js-enroll-native .btn, .js-enroll-native button, .js-enroll-native .enroll"))
+        document.querySelector(".js-enroll-native .btn, .js-enroll-native button, .js-enroll-native .enroll, .enroll--learning-path .btn, .enroll--learning-path button"))
     );
 
     root.classList.toggle("course-purchasable", !!purchasable);
@@ -81,7 +83,10 @@
     var showNative = loggedIn && ready && (hasAccess || purchasable);
 
     setDisplay(document.querySelectorAll(".entitlement-gate, .js-entitlement-gate"), showGate);
-    setDisplay(document.querySelectorAll(".js-enroll-native, .course-purchase__mobile-button"), showNative);
+    setDisplay(
+      document.querySelectorAll(".js-enroll-native, .course-purchase__mobile-button, .widget--learning-path-purchase"),
+      showNative
+    );
   }
 
   var tries = 0;
