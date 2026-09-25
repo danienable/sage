@@ -1,22 +1,4 @@
 (function () {
-  var strings = {
-    en: "You are a {name} Holder",
-    de: "Sie sind Inhaber von {name}",
-    "fr-FR": "Vous êtes titulaire de {name}",
-    "fr-CA": "Vous êtes titulaire de {name}",
-    es: "Es titular de {name}",
-    pt: "Você é titular de {name}"
-  };
-
-  var displayNames = {
-    ENT_NA_50_US_CustomerLearningMembership_C: "Sage 50 Customer Learning Membership",
-    ENT_NA_50_US_ProductSubscription_C: "Sage 50 US Product Subscription"
-  };
-
-  var homePaths = {
-    "/learn/dashboard": true
-  };
-
   function mapLang(lang) {
     if (!lang) return null;
     var l = String(lang).toLowerCase().replace("_", "-");
@@ -41,14 +23,36 @@
     return "en";
   }
 
-  function message(name) {
-    var template = strings[detectLang()] || strings.en;
-    return template.replace("{name}", name);
+  function clean(value) {
+    return String(value == null ? "" : value).replace(/^\s+|\s+$/g, "");
   }
 
-  function label(value) {
-    var text = String(value == null ? "" : value).replace(/^\s+|\s+$/g, "");
-    return displayNames[text] || text;
+  function templateRoot() {
+    var tpl = document.getElementById("entitlement-ack-template");
+    if (!tpl || !tpl.content) return null;
+    return tpl.content.querySelector(".entitlement-ack");
+  }
+
+  function displayName(code) {
+    var root = templateRoot();
+    if (!root) return code;
+    var nodes = root.querySelectorAll("[data-code]");
+    for (var i = 0; i < nodes.length; i++) {
+      if (clean(nodes[i].getAttribute("data-code")) === code) {
+        return clean(nodes[i].textContent) || code;
+      }
+    }
+    return code;
+  }
+
+  function messageTemplate() {
+    var root = templateRoot();
+    if (!root) return "";
+    var lang = detectLang();
+    var node =
+      root.querySelector('.entitlement-ack__templates [data-lang="' + lang + '"]') ||
+      root.querySelector('.entitlement-ack__templates [data-lang="en"]');
+    return node ? clean(node.textContent) : "";
   }
 
   function currentUser() {
@@ -58,11 +62,6 @@
     } catch (e) {
       return null;
     }
-  }
-
-  function isLearnerHome() {
-    var path = (location.pathname || "/").replace(/\/+$/, "") || "/";
-    return !!homePaths[path];
   }
 
   function collectCodes(value, out, depth, seen) {
@@ -131,9 +130,9 @@
   var scannedFor = null;
   var cachedCodes = [];
 
-  // Sublicense codes on the logged-in user are mapped to display names.
+  // Sublicense codes on the logged-in user are mapped with the names in the HTML.
   // Unmapped codes stay visible so missing names are obvious.
-  // Preview on /learn/dashboard: ?ackPreview=1 for one, ?ackPreview=2 for both
+  // Preview: ?ackPreview=1 for one, ?ackPreview=2 for both
   function sublicenses(user) {
     var codes = [];
     if (user && user.id) {
@@ -147,7 +146,7 @@
     }
     var labeled = [];
     var combined = codes.concat(previewNames());
-    for (var i = 0; i < combined.length; i++) labeled.push(label(combined[i]));
+    for (var i = 0; i < combined.length; i++) labeled.push(displayName(combined[i]));
     return unique(labeled);
   }
 
@@ -162,38 +161,62 @@
     return null;
   }
 
+  function isPlaced(live, mount) {
+    if (!live || !live.parentNode) return false;
+    if (mount.where === "afterend") return live.previousElementSibling === mount.node;
+    return live.nextElementSibling === mount.node;
+  }
+
   function removeBars() {
     var bars = document.querySelectorAll(".entitlement-ack");
     for (var i = 0; i < bars.length; i++) bars[i].parentNode.removeChild(bars[i]);
   }
 
-  function render(names) {
-    var mount = findMount();
-    if (!mount) return false;
+  function lineText(templateText, name) {
+    return templateText.split("{name}").join(name);
+  }
 
-    var existing = document.querySelectorAll(".entitlement-ack__text");
-    var same = existing.length === names.length;
-    for (var i = 0; same && i < names.length; i++) {
-      if (existing[i].textContent !== message(names[i])) same = false;
+  function render(names) {
+    var src = templateRoot();
+    var templateText = messageTemplate();
+    var mount = findMount();
+    if (!src || !templateText || !mount) return false;
+
+    var messages = [];
+    for (var i = 0; i < names.length; i++) messages.push(lineText(templateText, names[i]));
+
+    var live = document.querySelector(".entitlement-ack");
+    var existing = live ? live.querySelectorAll(".entitlement-ack__lines .entitlement-ack__text") : [];
+    var same = isPlaced(live, mount) && existing.length === messages.length;
+    for (var n = 0; same && n < messages.length; n++) {
+      if (existing[n].textContent !== messages[n]) same = false;
     }
     if (same) return true;
 
-    removeBars();
-    var bar = document.createElement("div");
-    bar.className = "entitlement-ack";
-    bar.setAttribute("role", "status");
-    for (var n = 0; n < names.length; n++) {
-      var text = document.createElement("p");
-      text.className = "entitlement-ack__text";
-      text.textContent = message(names[n]);
-      bar.appendChild(text);
+    if (!isPlaced(live, mount)) {
+      removeBars();
+      live = src.cloneNode(true);
+      mount.node.insertAdjacentElement(mount.where, live);
     }
-    mount.node.insertAdjacentElement(mount.where, bar);
+
+    var proto =
+      live.querySelector('.entitlement-ack__templates [data-lang="' + detectLang() + '"]') ||
+      live.querySelector('.entitlement-ack__templates [data-lang="en"]');
+    var lines = live.querySelector(".entitlement-ack__lines");
+    if (!proto || !lines) return false;
+
+    while (lines.firstChild) lines.removeChild(lines.firstChild);
+    for (var m = 0; m < messages.length; m++) {
+      var line = proto.cloneNode(true);
+      line.removeAttribute("data-lang");
+      line.textContent = messages[m];
+      lines.appendChild(line);
+    }
     return true;
   }
 
   function apply() {
-    if (!isLearnerHome()) return true;
+    if (!templateRoot()) return false;
     var user = currentUser();
     var loggedIn = !!(user && user.id) || document.documentElement.classList.contains("is-logged-in");
     if (!loggedIn) return false;
@@ -205,11 +228,11 @@
     return render(names);
   }
 
+  var tries = 0;
   var timer = setInterval(function () {
-    if (!isLearnerHome()) {
-      clearInterval(timer);
-      return;
-    }
+    tries += 1;
     apply();
+    if ((currentUser() && currentUser().id) || tries > 40) clearInterval(timer);
   }, 250);
+  apply();
 })();
