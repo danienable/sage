@@ -34,6 +34,32 @@
     return clean(full.split(/\s+/)[0]);
   }
 
+  function nameFromHeader() {
+    var selectors = [
+      ".header-user-name",
+      ".user-menu__name",
+      ".user-name",
+      "[data-testid='user-name']",
+      ".avatar-menu__name",
+      ".navbar-user-name"
+    ];
+    for (var i = 0; i < selectors.length; i++) {
+      var el = document.querySelector(selectors[i]);
+      var text = el ? clean(el.textContent) : "";
+      if (text) return clean(text.split(/\s+/)[0]);
+    }
+
+    var buttons = document.querySelectorAll("header button, header [role='button'], .header button");
+    for (var n = 0; n < buttons.length; n++) {
+      var label = clean(buttons[n].textContent).replace(/\s+/g, " ");
+      if (!label || label.length > 60) continue;
+      if (/sign\s*in|log\s*in|menu|search|catalog/i.test(label)) continue;
+      var parts = label.split(" ");
+      if (parts.length >= 2 && parts.length <= 4) return parts[0];
+    }
+    return "";
+  }
+
   function findMount() {
     var wrapper = document.querySelector(".header-wrapper, #header-wrapper");
     if (wrapper) return { node: wrapper, where: "afterend" };
@@ -43,15 +69,13 @@
     );
     if (header) return { node: header, where: "afterend" };
 
-    var main = document.querySelector("main, #skilljar-content");
+    var main = document.querySelector("main, .dashboard, .dashboard__main");
     if (main) return { node: main, where: "beforebegin" };
     return null;
   }
 
-  function source() {
-    var tpl = document.getElementById("home-hero-template");
-    if (!tpl || !tpl.content) return null;
-    return tpl.content.querySelector(".home-hero");
+  function hero() {
+    return document.querySelector(".home-hero");
   }
 
   function isPlaced(live, mount) {
@@ -60,43 +84,35 @@
     return live.nextElementSibling === mount.node;
   }
 
-  function removeHero() {
-    var heroes = document.querySelectorAll(".home-hero");
-    for (var i = 0; i < heroes.length; i++) heroes[i].parentNode.removeChild(heroes[i]);
-  }
-
   function fill(live, name) {
-    if (live.getAttribute("data-name") === name) return;
     var nameEl = live.querySelector(".home-hero__name");
-    if (nameEl) nameEl.textContent = name;
+    if (nameEl && nameEl.textContent !== name) nameEl.textContent = name;
     var hello = live.querySelector(".home-hero__hello");
     var helloText = hello ? clean(hello.textContent) : "";
     var label = helloText && name ? helloText + " " + name : helloText || name;
     if (label) live.setAttribute("aria-label", label);
     live.setAttribute("data-name", name);
+    live.classList.add("is-ready");
   }
 
   function apply() {
+    var live = hero();
     var mount = findMount();
-    var src = source();
-    if (!mount || !src) return false;
+    if (!live || !mount) return false;
 
-    var live = document.querySelector(".home-hero");
     if (!isPlaced(live, mount)) {
-      removeHero();
-      live = src.cloneNode(true);
       mount.node.insertAdjacentElement(mount.where, live);
     }
 
-    fill(live, firstName(currentUser()));
-    return true;
+    var name = firstName(currentUser()) || nameFromHeader();
+    fill(live, name);
+    return !!name;
   }
 
   var tries = 0;
   var timer = setInterval(function () {
     tries += 1;
-    apply();
-    if ((currentUser() && currentUser().id) || tries > 40) clearInterval(timer);
+    if (apply() || tries > 80) clearInterval(timer);
   }, 250);
   apply();
 })();

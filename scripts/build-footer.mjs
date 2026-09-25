@@ -2,22 +2,36 @@ import fs from "node:fs";
 import path from "node:path";
 
 const scriptDir = path.resolve("components/scripts");
-const outFile = path.resolve("dist/tracking-scripts.html");
+const outDir = path.resolve("dist");
 
-const files = [
+const footerFiles = [
   "mark-auth.js",
-  "entitlement-ack.js",
   "anon-enroll-i18n.js",
   "mark-course.js",
   "entitlement-gate-i18n.js",
   "stamp-page-types.js",
 ];
 
-const blocks = files.map((file) => {
+// Page-only scripts: paste with the matching HTML on that page, not in the footer.
+const pageScripts = [
+  { file: "home-hero.js", out: "home-hero-script.html", page: "main dashboard (/)" },
+  { file: "entitlement-ack.js", out: "entitlement-ack-script.html", page: "learner dashboard (/learn/dashboard)" },
+];
+
+function scriptBlock(file) {
   const src = fs.readFileSync(path.join(scriptDir, file), "utf8").trim();
   return `<script>\n${src}\n</script>`;
-});
+}
 
-fs.mkdirSync(path.dirname(outFile), { recursive: true });
-fs.writeFileSync(outFile, `${blocks.join("\n\n")}\n`);
-console.log(`Wrote ${path.relative(process.cwd(), outFile)}`);
+fs.mkdirSync(outDir, { recursive: true });
+
+const footerOut = path.join(outDir, "tracking-scripts.html");
+fs.writeFileSync(footerOut, `${footerFiles.map(scriptBlock).join("\n\n")}\n`);
+console.log(`Wrote ${path.relative(process.cwd(), footerOut)}`);
+
+for (const page of pageScripts) {
+  const outFile = path.join(outDir, page.out);
+  const note = `<!-- Paste on ${page.page} with components/${page.file.replace(/\.js$/, ".html")} -->\n`;
+  fs.writeFileSync(outFile, `${note}${scriptBlock(page.file)}\n`);
+  console.log(`Wrote ${path.relative(process.cwd(), outFile)}`);
+}

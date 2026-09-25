@@ -27,16 +27,14 @@
     return String(value == null ? "" : value).replace(/^\s+|\s+$/g, "");
   }
 
-  function templateRoot() {
-    var tpl = document.getElementById("entitlement-ack-template");
-    if (!tpl || !tpl.content) return null;
-    return tpl.content.querySelector(".entitlement-ack");
+  function root() {
+    return document.querySelector(".entitlement-ack");
   }
 
   function displayName(code) {
-    var root = templateRoot();
-    if (!root) return code;
-    var nodes = root.querySelectorAll("[data-code]");
+    var el = root();
+    if (!el) return code;
+    var nodes = el.querySelectorAll(".entitlement-ack__catalog [data-code]");
     for (var i = 0; i < nodes.length; i++) {
       if (clean(nodes[i].getAttribute("data-code")) === code) {
         return clean(nodes[i].textContent) || code;
@@ -46,12 +44,12 @@
   }
 
   function messageTemplate() {
-    var root = templateRoot();
-    if (!root) return "";
+    var el = root();
+    if (!el) return "";
     var lang = detectLang();
     var node =
-      root.querySelector('.entitlement-ack__templates [data-lang="' + lang + '"]') ||
-      root.querySelector('.entitlement-ack__templates [data-lang="en"]');
+      el.querySelector('.entitlement-ack__templates [data-lang="' + lang + '"]') ||
+      el.querySelector('.entitlement-ack__templates [data-lang="en"]');
     return node ? clean(node.textContent) : "";
   }
 
@@ -167,9 +165,9 @@
     return live.nextElementSibling === mount.node;
   }
 
-  function removeBars() {
-    var bars = document.querySelectorAll(".entitlement-ack");
-    for (var i = 0; i < bars.length; i++) bars[i].parentNode.removeChild(bars[i]);
+  function hide() {
+    var el = root();
+    if (el) el.classList.remove("is-ready");
   }
 
   function lineText(templateText, name) {
@@ -177,33 +175,33 @@
   }
 
   function render(names) {
-    var src = templateRoot();
+    var live = root();
     var templateText = messageTemplate();
     var mount = findMount();
-    if (!src || !templateText || !mount) return false;
+    if (!live || !templateText || !mount) return false;
+
+    if (!isPlaced(live, mount)) {
+      mount.node.insertAdjacentElement(mount.where, live);
+    }
 
     var messages = [];
     for (var i = 0; i < names.length; i++) messages.push(lineText(templateText, names[i]));
-
-    var live = document.querySelector(".entitlement-ack");
-    var existing = live ? live.querySelectorAll(".entitlement-ack__lines .entitlement-ack__text") : [];
-    var same = isPlaced(live, mount) && existing.length === messages.length;
-    for (var n = 0; same && n < messages.length; n++) {
-      if (existing[n].textContent !== messages[n]) same = false;
-    }
-    if (same) return true;
-
-    if (!isPlaced(live, mount)) {
-      removeBars();
-      live = src.cloneNode(true);
-      mount.node.insertAdjacentElement(mount.where, live);
-    }
 
     var proto =
       live.querySelector('.entitlement-ack__templates [data-lang="' + detectLang() + '"]') ||
       live.querySelector('.entitlement-ack__templates [data-lang="en"]');
     var lines = live.querySelector(".entitlement-ack__lines");
     if (!proto || !lines) return false;
+
+    var existing = lines.querySelectorAll(".entitlement-ack__text");
+    var same = existing.length === messages.length;
+    for (var n = 0; same && n < messages.length; n++) {
+      if (existing[n].textContent !== messages[n]) same = false;
+    }
+    if (same) {
+      live.classList.add("is-ready");
+      return true;
+    }
 
     while (lines.firstChild) lines.removeChild(lines.firstChild);
     for (var m = 0; m < messages.length; m++) {
@@ -212,18 +210,23 @@
       line.textContent = messages[m];
       lines.appendChild(line);
     }
+    live.classList.add("is-ready");
     return true;
   }
 
   function apply() {
-    if (!templateRoot()) return false;
+    var live = root();
+    if (!live) return false;
     var user = currentUser();
     var loggedIn = !!(user && user.id) || document.documentElement.classList.contains("is-logged-in");
-    if (!loggedIn) return false;
+    if (!loggedIn) {
+      hide();
+      return false;
+    }
     var names = sublicenses(user);
     if (!names.length) {
-      removeBars();
-      return true;
+      hide();
+      return false;
     }
     return render(names);
   }
@@ -231,8 +234,7 @@
   var tries = 0;
   var timer = setInterval(function () {
     tries += 1;
-    apply();
-    if ((currentUser() && currentUser().id) || tries > 40) clearInterval(timer);
+    if (apply() || tries > 80) clearInterval(timer);
   }, 250);
   apply();
 })();
