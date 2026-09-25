@@ -1,0 +1,133 @@
+<template id="home-hero-template">
+  <section class="home-hero" aria-label="Howdy">
+    <div class="home-hero__art" aria-hidden="true">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 780 300"
+        preserveAspectRatio="xMaxYMid slice"
+      >
+        <defs>
+          <radialGradient
+            id="home-hero-glow"
+            cx="70%"
+            cy="46%"
+            r="55%"
+          >
+            <stop
+              offset="0%"
+              stop-color="#7ae8ff"
+              stop-opacity="0.85"
+            ></stop>
+            <stop
+              offset="42%"
+              stop-color="#1496d4"
+              stop-opacity="0.45"
+            ></stop>
+            <stop
+              offset="100%"
+              stop-color="#06315c"
+              stop-opacity="0"
+            ></stop>
+          </radialGradient>
+          <linearGradient
+            id="home-hero-panel"
+            x1="0"
+            y1="0"
+            x2="1"
+            y2="1"
+          >
+            <stop
+              offset="0%"
+              stop-color="#d7f7ff"
+              stop-opacity="0.38"
+            ></stop>
+            <stop
+              offset="100%"
+              stop-color="#0a6ea8"
+              stop-opacity="0.04"
+            ></stop>
+          </linearGradient>
+          <pattern
+            id="home-hero-dots"
+            width="12"
+            height="12"
+            patternUnits="userSpaceOnUse"
+          >
+            <rect
+              width="3.2"
+              height="3.2"
+              rx="0.6"
+              fill="#e9fcff"
+            ></rect>
+          </pattern>
+          <mask id="home-hero-cloud-mask">
+            <rect
+              width="780"
+              height="300"
+              fill="#000"
+            ></rect>
+            <ellipse
+              cx="460"
+              cy="128"
+              rx="270"
+              ry="150"
+              fill="#fff"
+            ></ellipse>
+            <ellipse
+              cx="650"
+              cy="176"
+              rx="250"
+              ry="145"
+              fill="#fff"
+            ></ellipse>
+          </mask>
+        </defs>
+        <ellipse
+          cx="560"
+          cy="150"
+          rx="280"
+          ry="150"
+          fill="url(#home-hero-glow)"
+        ></ellipse>
+        <rect
+          x="300"
+          y="36"
+          width="250"
+          height="64"
+          rx="8"
+          transform="rotate(-18 425 68)"
+          fill="url(#home-hero-panel)"
+        ></rect>
+        <rect
+          x="470"
+          y="96"
+          width="220"
+          height="48"
+          rx="6"
+          transform="rotate(-14 580 120)"
+          fill="#7adfff"
+          opacity="0.16"
+        ></rect>
+        <rect
+          width="780"
+          height="300"
+          fill="url(#home-hero-dots)"
+          mask="url(#home-hero-cloud-mask)"
+          opacity="0.8"
+        ></rect>
+      </svg>
+    </div>
+    <div class="sage-container home-hero__inner">
+      <p class="home-hero__greeting">
+        <span class="home-hero__hello">Howdy</span>
+        <span class="home-hero__name"></span>
+      </p>
+      <p class="home-hero__prompt">Where would you like to go today?</p>
+      <nav class="home-hero__actions" aria-label="Dashboard shortcuts">
+        <a class="home-hero__link" href="#quick-links">Quick Links</a>
+        <a class="home-hero__link" href="#our-regions">Our Regions</a>
+        <a class="home-hero__link" href="#admin-community">Admin Community</a>
+      </nav>
+    </div>
+  </section>
+</template>
