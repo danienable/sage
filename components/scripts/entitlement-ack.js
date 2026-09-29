@@ -11,7 +11,38 @@
     return null;
   }
 
+  function cookieValue(name) {
+    var parts = document.cookie ? document.cookie.split(";") : [];
+    for (var i = 0; i < parts.length; i++) {
+      var bit = parts[i].replace(/^\s+/, "");
+      if (bit.indexOf(name + "=") !== 0) continue;
+      try {
+        return decodeURIComponent(bit.slice(name.length + 1));
+      } catch (e) {
+        return "";
+      }
+    }
+    return "";
+  }
+
+  function selectedLang() {
+    try {
+      var conf = window.CONF || {};
+      var preload = conf.preload && conf.preload.currentUser;
+      var users = [preload && preload.currentUser, preload, conf.currentUser, conf.user];
+      for (var i = 0; i < users.length; i++) {
+        var user = users[i];
+        if (user && user.lang) return String(user.lang);
+      }
+      if (conf.lang) return String(conf.lang);
+      if (conf.locale) return String(conf.locale);
+    } catch (e) {}
+    return cookieValue("lang") || cookieValue("locale") || cookieValue("language") || "";
+  }
+
   function detectLang() {
+    var selected = mapLang(selectedLang());
+    if (selected) return selected;
     var list =
       navigator.languages && navigator.languages.length
         ? navigator.languages
@@ -29,18 +60,6 @@
 
   function root() {
     return document.querySelector(".entitlement-ack");
-  }
-
-  function displayName(code) {
-    var el = root();
-    if (!el) return code;
-    var nodes = el.querySelectorAll(".entitlement-ack__catalog [data-code]");
-    for (var i = 0; i < nodes.length; i++) {
-      if (clean(nodes[i].getAttribute("data-code")) === code) {
-        return clean(nodes[i].textContent) || code;
-      }
-    }
-    return code;
   }
 
   function messageTemplate() {
@@ -62,30 +81,22 @@
     }
   }
 
-  function addToken(value, out) {
-    var text = clean(value);
-    if (!text) return;
-    var matches = text.match(/ENT_[A-Za-z0-9_]+/g);
-    if (matches) {
-      for (var i = 0; i < matches.length; i++) out.push(matches[i]);
-      return;
-    }
-    out.push(text);
+  function licenseId(item) {
+    if (typeof item === "string") return clean(item);
+    if (!item || typeof item !== "object") return "";
+    if (typeof item.license === "string") return clean(item.license);
+    if (typeof item.id === "string" && item.id.indexOf("--") !== -1) return clean(item.id.split("--").pop());
+    return "";
   }
 
   function addLicense(item, out) {
     if (item == null) return;
-    if (typeof item === "string") {
-      addToken(item, out);
+    if (Object.prototype.toString.call(item) === "[object Array]") {
+      for (var i = 0; i < item.length; i++) addLicense(item[i], out);
       return;
     }
-    if (typeof item !== "object") return;
-    addToken(item.sku, out);
-    addToken(item.code, out);
-    addToken(item.name, out);
-    addToken(item.externalId, out);
-    addToken(item.productCode, out);
-    if (item.license) addLicense(item.license, out);
+    var id = licenseId(item);
+    if (id) out.push(id);
   }
 
   function unique(list) {
@@ -105,10 +116,7 @@
   function heldTokens(user) {
     var found = [];
     if (!user) return found;
-    var licenses = user.allocatedLicenses;
-    if (Object.prototype.toString.call(licenses) === "[object Array]") {
-      for (var i = 0; i < licenses.length; i++) addLicense(licenses[i], found);
-    }
+    addLicense(user.allocatedLicenses, found);
     addLicense(user.activeLicense, found);
     return unique(found);
   }
@@ -126,9 +134,7 @@
     for (var n = 0; n < nodes.length; n++) {
       var code = clean(nodes[n].getAttribute("data-code"));
       var label = clean(nodes[n].textContent);
-      if ((code && held[code.toLowerCase()]) || (label && held[label.toLowerCase()])) {
-        names.push(label || code);
-      }
+      if (code && held[code.toLowerCase()]) names.push(label || code);
     }
     return unique(names);
   }

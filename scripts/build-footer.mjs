@@ -14,9 +14,18 @@ const footerFiles = [
 
 // Page-only scripts: paste with the matching HTML on that page, not in the footer.
 const pageScripts = [
-  { file: "home-hero.js", out: "home-hero-script.html", page: "main dashboard (/)" },
-  { file: "learner-greeting.js", out: "learner-greeting-script.html", page: "learner dashboard (/learn/dashboard)" },
-  { file: "entitlement-ack.js", out: "entitlement-ack-script.html", page: "main dashboard (/)" },
+  {
+    files: ["home-hero.js"],
+    out: "home-hero-script.html",
+    page: "main dashboard (/)",
+    html: ["home-hero.html"],
+  },
+  {
+    files: ["learner-greeting.js", "entitlement-ack.js"],
+    out: "learner-dashboard-script.html",
+    page: "learner dashboard (/learn/dashboard)",
+    html: ["learner-greeting.html", "entitlement-ack.html"],
+  },
 ];
 
 function scriptBlock(file) {
@@ -32,7 +41,8 @@ console.log(`Wrote ${path.relative(process.cwd(), footerOut)}`);
 
 for (const page of pageScripts) {
   const outFile = path.join(outDir, page.out);
-  const note = `<!-- Paste on ${page.page} with components/${page.file.replace(/\.js$/, ".html")} -->\n`;
-  fs.writeFileSync(outFile, `${note}${scriptBlock(page.file)}\n`);
+  const html = page.html.map((name) => `components/${name}`).join(" and ");
+  const note = `<!-- Paste on ${page.page} with ${html} -->\n`;
+  fs.writeFileSync(outFile, `${note}${page.files.map(scriptBlock).join("\n\n")}\n`);
   console.log(`Wrote ${path.relative(process.cwd(), outFile)}`);
 }

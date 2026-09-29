@@ -823,6 +823,10 @@ header.header--microsite #cart-button .badge {
   LEARNER GREETING
 ***********************/
 
+.learner-greeting__templates {
+  display: none !important;
+}
+
 .learner-greeting {
   box-sizing: border-box;
   margin: 0;
