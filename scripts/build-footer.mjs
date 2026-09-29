@@ -15,7 +15,8 @@ const footerFiles = [
 // Page-only scripts: paste with the matching HTML on that page, not in the footer.
 const pageScripts = [
   { file: "home-hero.js", out: "home-hero-script.html", page: "main dashboard (/)" },
-  { file: "entitlement-ack.js", out: "entitlement-ack-script.html", page: "learner dashboard (/learn/dashboard)" },
+  { file: "learner-greeting.js", out: "learner-greeting-script.html", page: "learner dashboard (/learn/dashboard)" },
+  { file: "entitlement-ack.js", out: "entitlement-ack-script.html", page: "main dashboard (/)" },
 ];
 
 function scriptBlock(file) {
