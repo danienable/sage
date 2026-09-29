@@ -89,10 +89,7 @@
     );
   }
 
-  var tries = 0;
-  var timer = setInterval(function () {
-    tries += 1;
-    markCourse();
-    if (tries > 40) clearInterval(timer);
-  }, 250);
+  // Catalog clicks are in-app route changes, not full loads, so this has to keep running.
+  setInterval(markCourse, 500);
+  markCourse();
 })();

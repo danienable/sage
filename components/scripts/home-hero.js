@@ -14,6 +14,9 @@
   }
 
   function findMount() {
+    var ack = document.querySelector(".entitlement-ack");
+    if (ack && ack.parentNode) return { node: ack, where: "afterend" };
+
     var wrapper = document.querySelector(".header-wrapper, #header-wrapper");
     if (wrapper) return { node: wrapper, where: "afterend" };
 

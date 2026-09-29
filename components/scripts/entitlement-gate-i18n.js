@@ -69,7 +69,7 @@
   }
 
   function setText(el, value) {
-    if (el && value != null) el.textContent = value;
+    if (el && value != null && el.textContent !== value) el.textContent = value;
   }
 
   function apply() {
@@ -84,9 +84,6 @@
     return true;
   }
 
-  var tries = 0;
-  var timer = setInterval(function () {
-    tries += 1;
-    if (apply() || tries > 40) clearInterval(timer);
-  }, 250);
+  setInterval(apply, 500);
+  apply();
 })();

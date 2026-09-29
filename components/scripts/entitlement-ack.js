@@ -62,27 +62,30 @@
     }
   }
 
-  function collectCodes(value, out, depth, seen) {
-    if (value == null || depth > 8) return;
-    if (typeof value === "string") {
-      var trimmed = value.replace(/^\s+|\s+$/g, "");
-      if (/^ENT_[A-Za-z0-9_]+$/.test(trimmed)) out.push(trimmed);
+  function addToken(value, out) {
+    var text = clean(value);
+    if (!text) return;
+    var matches = text.match(/ENT_[A-Za-z0-9_]+/g);
+    if (matches) {
+      for (var i = 0; i < matches.length; i++) out.push(matches[i]);
       return;
     }
-    if (typeof value !== "object") return;
-    for (var i = 0; i < seen.length; i++) {
-      if (seen[i] === value) return;
-    }
-    seen.push(value);
-    if (Object.prototype.toString.call(value) === "[object Array]") {
-      for (var n = 0; n < value.length; n++) collectCodes(value[n], out, depth + 1, seen);
+    out.push(text);
+  }
+
+  function addLicense(item, out) {
+    if (item == null) return;
+    if (typeof item === "string") {
+      addToken(item, out);
       return;
     }
-    for (var key in value) {
-      if (Object.prototype.hasOwnProperty.call(value, key)) {
-        collectCodes(value[key], out, depth + 1, seen);
-      }
-    }
+    if (typeof item !== "object") return;
+    addToken(item.sku, out);
+    addToken(item.code, out);
+    addToken(item.name, out);
+    addToken(item.externalId, out);
+    addToken(item.productCode, out);
+    if (item.license) addLicense(item.license, out);
   }
 
   function unique(list) {
@@ -99,53 +102,35 @@
     return out;
   }
 
-  function previewNames() {
-    var one = ["ENT_NA_50_US_CustomerLearningMembership_C"];
-    var both = ["ENT_NA_50_US_CustomerLearningMembership_C", "ENT_NA_50_US_ProductSubscription_C"];
-
-    function fromValue(value) {
-      if (value === 1 || value === "1") return one.slice();
-      if (value === 2 || value === "2") return both.slice();
-      return null;
+  function heldTokens(user) {
+    var found = [];
+    if (!user) return found;
+    var licenses = user.allocatedLicenses;
+    if (Object.prototype.toString.call(licenses) === "[object Array]") {
+      for (var i = 0; i < licenses.length; i++) addLicense(licenses[i], found);
     }
-
-    var preset = fromValue(window.SAGE_ACK_PREVIEW);
-    if (preset) return preset;
-    if (typeof window.SAGE_ACK_PREVIEW === "string") return unique([window.SAGE_ACK_PREVIEW]);
-    if (Object.prototype.toString.call(window.SAGE_ACK_PREVIEW) === "[object Array]") {
-      return unique(window.SAGE_ACK_PREVIEW);
-    }
-
-    var query = location.search || "";
-    var match = query.match(/(?:^|[?&])ackPreview=([^&]*)/);
-    if (!match) return [];
-    var value = decodeURIComponent(match[1].replace(/\+/g, " "));
-    preset = fromValue(value);
-    if (preset) return preset;
-    return unique(value.split(","));
+    addLicense(user.activeLicense, found);
+    return unique(found);
   }
 
-  var scannedFor = null;
-  var cachedCodes = [];
+  // Show a catalog row only when the user holds that code or its display name.
+  function entitlements(user) {
+    var el = root();
+    if (!el || !user) return [];
+    var held = {};
+    var tokens = heldTokens(user);
+    for (var i = 0; i < tokens.length; i++) held[tokens[i].toLowerCase()] = true;
 
-  // Sublicense codes on the logged-in user are mapped with the names in the HTML.
-  // Unmapped codes stay visible so missing names are obvious.
-  // Preview: ?ackPreview=1 for one, ?ackPreview=2 for both
-  function sublicenses(user) {
-    var codes = [];
-    if (user && user.id) {
-      if (scannedFor !== user.id || !cachedCodes.length) {
-        var found = [];
-        collectCodes(user, found, 0, []);
-        cachedCodes = unique(found);
-        scannedFor = user.id;
+    var names = [];
+    var nodes = el.querySelectorAll(".entitlement-ack__catalog [data-code]");
+    for (var n = 0; n < nodes.length; n++) {
+      var code = clean(nodes[n].getAttribute("data-code"));
+      var label = clean(nodes[n].textContent);
+      if ((code && held[code.toLowerCase()]) || (label && held[label.toLowerCase()])) {
+        names.push(label || code);
       }
-      codes = cachedCodes;
     }
-    var labeled = [];
-    var combined = codes.concat(previewNames());
-    for (var i = 0; i < combined.length; i++) labeled.push(displayName(combined[i]));
-    return unique(labeled);
+    return unique(names);
   }
 
   function findMount() {
@@ -223,7 +208,7 @@
       hide();
       return false;
     }
-    var names = sublicenses(user);
+    var names = entitlements(user);
     if (!names.length) {
       hide();
       return false;
