@@ -112,39 +112,36 @@
     return live.nextElementSibling === mount.node;
   }
 
-  function renderedTitle(template, name) {
-    return template.split("{name}").join(name).replace(/[ \t]{2,}/g, " ").replace(/^\s+|\s+$/g, "");
+  function setText(node, text) {
+    if (!node || !text || node.textContent === text) return;
+    node.textContent = text;
   }
 
   function fill(live, name) {
+    var hello = live.querySelector(".learner-greeting__hello");
+    setText(hello, partTemplate(live, "hello"));
+
     var nameEl = live.querySelector(".learner-greeting__name");
-    if (nameEl) {
-      var nameText = name ? " " + name : "";
-      if (name && nameEl.textContent !== nameText) nameEl.textContent = nameText;
+    if (nameEl && nameEl.textContent !== name) nameEl.textContent = name;
+
+    setText(live.querySelector(".learner-greeting__prompt"), partTemplate(live, "prompt"));
+    setText(live.querySelector(".learner-greeting__lead"), partTemplate(live, "lead"));
+
+    var links = live.querySelectorAll(".learner-greeting__link");
+    for (var i = 0; i < links.length; i++) {
+      setText(links[i], partTemplate(live, links[i].getAttribute("data-part")));
     }
 
-    var title = live.querySelector(".learner-greeting__title");
-    var titleTemplate = partTemplate(live, "title");
-    if (!titleTemplate && title && title.textContent.indexOf("{name}") !== -1) {
-      titleTemplate = String(title.textContent || "");
-    }
-    if (title && titleTemplate) {
-      var rendered = renderedTitle(titleTemplate, name);
-      if (title.textContent !== rendered) title.textContent = rendered;
-    }
+    var nav = live.querySelector(".learner-greeting__actions");
+    var navLabel = partTemplate(live, "nav");
+    if (nav && navLabel) nav.setAttribute("aria-label", navLabel);
 
-    var prompt = live.querySelector(".learner-greeting__prompt");
-    var promptTemplate = partTemplate(live, "prompt");
-    if (prompt && promptTemplate && prompt.textContent !== promptTemplate) prompt.textContent = promptTemplate;
-
-    var labelSource = title ? title.textContent : "";
-    var label = String(labelSource || "").replace(/\s+/g, " ").replace(/^\s+|\s+$/g, "");
-    if (label && label.indexOf("{name}") === -1) live.setAttribute("aria-label", label);
+    var helloText = hello ? String(hello.textContent || "").replace(/^\s+|\s+$/g, "") : "";
+    var label = helloText && name ? helloText + " " + name + "!" : helloText || name;
+    if (label) live.setAttribute("aria-label", label);
     live.setAttribute("data-name", name);
     live.classList.add("is-ready");
-    if (!name) return false;
-    if (nameEl) return nameEl.textContent.indexOf(name) !== -1;
-    return !!title && title.textContent.indexOf(name) !== -1 && title.textContent.indexOf("{name}") === -1;
+    return !!name && !!nameEl && nameEl.textContent.indexOf(name) !== -1;
   }
 
   function apply() {
