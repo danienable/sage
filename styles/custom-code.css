@@ -436,11 +436,25 @@ header.header--microsite #cart-button .badge {
   background: transparent !important;
 }
 
+.header.header--dashboard .header__inner > .row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin: 0;
+}
+
 .header.header--dashboard .column {
   position: relative;
-  float: left;
+  float: none;
   width: auto;
-  padding: 0 1rem 0 0;
+  padding: 0;
+}
+
+.header.header--dashboard .column:last-child {
+  display: flex;
+  justify-content: flex-end;
+  margin-left: auto;
 }
 
 .header.header--dashboard .company__beta-logo {
