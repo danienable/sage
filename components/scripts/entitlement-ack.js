@@ -1,4 +1,12 @@
+/*
+  Teal entitlement bar on the learner dashboard (/learn/dashboard).
+  Paste with components/entitlement-ack.html. Combined with the welcome banner
+  in dist/learner-dashboard-script.html.
+  Shows one line per sublicense the learner holds. The license id in the HTML
+  must match the license on the person. The words learners see come from that HTML.
+*/
 (function () {
+  /* Turns a language tag such as fr-ca or de-DE into one of our template languages. */
   function mapLang(lang) {
     if (!lang) return null;
     var l = String(lang).toLowerCase().replace("_", "-");
@@ -11,6 +19,7 @@
     return null;
   }
 
+  /* Reads one cookie. Used only if the profile has no language saved. */
   function cookieValue(name) {
     var parts = document.cookie ? document.cookie.split(";") : [];
     for (var i = 0; i < parts.length; i++) {
@@ -25,6 +34,7 @@
     return "";
   }
 
+  /* Language the learner chose, before we look at the browser. */
   function selectedLang() {
     try {
       var conf = window.CONF || {};
@@ -40,6 +50,7 @@
     return cookieValue("lang") || cookieValue("locale") || cookieValue("language") || "";
   }
 
+  /* Chosen language first, then the browser language, then English. */
   function detectLang() {
     var selected = mapLang(selectedLang());
     if (selected) return selected;
@@ -54,14 +65,17 @@
     return "en";
   }
 
+  /* Trims a value so ids and labels compare cleanly. */
   function clean(value) {
     return String(value == null ? "" : value).replace(/^\s+|\s+$/g, "");
   }
 
+  /* The bar markup from entitlement-ack.html. */
   function root() {
     return document.querySelector(".entitlement-ack");
   }
 
+  /* The sentence for this language. {name} is replaced with the product name. */
   function messageTemplate() {
     var el = root();
     if (!el) return "";
@@ -72,6 +86,7 @@
     return node ? clean(node.textContent) : "";
   }
 
+  /* The signed-in person, once Thought Industries has loaded them. */
   function currentUser() {
     try {
       var preload = window.CONF && window.CONF.preload && window.CONF.preload.currentUser;
@@ -81,6 +96,7 @@
     }
   }
 
+  /* The license id on one entitlement, whether it is stored as text or an object. */
   function licenseId(item) {
     if (typeof item === "string") return clean(item);
     if (!item || typeof item !== "object") return "";
@@ -89,6 +105,7 @@
     return "";
   }
 
+  /* Collects license ids, including when they arrive in a list. */
   function addLicense(item, out) {
     if (item == null) return;
     if (Object.prototype.toString.call(item) === "[object Array]") {
@@ -99,6 +116,7 @@
     if (id) out.push(id);
   }
 
+  /* Drops blank and repeated names without caring about letter case. */
   function unique(list) {
     var seen = {};
     var out = [];
@@ -113,6 +131,7 @@
     return out;
   }
 
+  /* License ids currently assigned to this person. */
   function heldTokens(user) {
     var found = [];
     if (!user) return found;
@@ -121,7 +140,7 @@
     return unique(found);
   }
 
-  // Show a catalog row only when the user holds that code or its display name.
+  /* Product names from the HTML catalog whose license id this person holds. */
   function entitlements(user) {
     var el = root();
     if (!el || !user) return [];
@@ -139,6 +158,7 @@
     return unique(names);
   }
 
+  /* Sit directly under the site header, above the welcome banner. */
   function findMount() {
     var header = document.querySelector(
       "header.header, header.site-header, body > header, header[role='banner'], .header, #header"
@@ -150,21 +170,25 @@
     return null;
   }
 
+  /* True when the bar is already in the right spot. */
   function isPlaced(live, mount) {
     if (!live || !live.parentNode) return false;
     if (mount.where === "afterend") return live.previousElementSibling === mount.node;
     return live.nextElementSibling === mount.node;
   }
 
+  /* Hides the bar when there is nothing to say. */
   function hide() {
     var el = root();
     if (el) el.classList.remove("is-ready");
   }
 
+  /* Drops the product name into the sentence in place of {name}. */
   function lineText(templateText, name) {
     return templateText.split("{name}").join(name);
   }
 
+  /* Builds one visible line per product and reveals the bar. */
   function render(names) {
     var live = root();
     var templateText = messageTemplate();
@@ -205,6 +229,7 @@
     return true;
   }
 
+  /* Shows the bar only for a signed-in learner who holds a listed license. */
   function apply() {
     var live = root();
     if (!live) return false;
@@ -222,6 +247,7 @@
     return render(names);
   }
 
+  /* The learner record often arrives after the page starts, so keep trying briefly. */
   var tries = 0;
   var timer = setInterval(function () {
     tries += 1;

@@ -1,10 +1,20 @@
+<!--
+  Teal bar for the learner dashboard (/learn/dashboard).
+  Paste this HTML on that page, together with components/learner-greeting.html
+  and dist/learner-dashboard-script.html.
+  Catalog: each data-code is a sublicense id. The text is the product name learners see.
+  Templates: the sentence for each language. {name} is replaced with that product name.
+  The bar stays hidden until the learner holds at least one of these licenses.
+-->
 <div class="entitlement-ack" role="status">
+  <!-- License id, then the name to show. Hidden on the page. -->
   <div class="entitlement-ack__catalog">
     <span data-code="83cec646-e59c-4235-96a8-c82187c4ebf7">Sage 50 Customer Learning Membership</span>
     <span data-code="1afaa150-e946-485a-8442-a02c23849eae">Sage 50 US Product Subscription</span>
     <span data-code="c76e6f91-4cd2-4651-b655-055f4f6fcd4b">Sage 50</span>
     <span data-code="7541f25d-d342-4bd5-bccf-c42859975afc">Sage HR</span>
   </div>
+  <!-- Sentence for each language. Hidden on the page. {name} becomes the product name. -->
   <div class="entitlement-ack__templates">
     <p class="entitlement-ack__text" data-lang="en">You are a {name} Holder</p>
     <p class="entitlement-ack__text" data-lang="de">Sie sind Inhaber von {name}</p>
@@ -13,5 +23,6 @@
     <p class="entitlement-ack__text" data-lang="es">Es titular de {name}</p>
     <p class="entitlement-ack__text" data-lang="pt">Você é titular de {name}</p>
   </div>
+  <!-- Filled by the script with one visible line per license the learner holds. -->
   <div class="entitlement-ack__lines"></div>
 </div>

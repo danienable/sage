@@ -1,3 +1,10 @@
+<!--
+  Course sidebar blocks. Paste this into the course sidebar content.
+  The footer script (dist/tracking-scripts.html) decides which block is visible:
+  logged-out visitors see the log-on choices below, and logged-in visitors without
+  access see the membership message. Translations for both blocks live in the footer scripts.
+  Edit the English here as the fallback. Edit the other languages in the matching script.
+-->
 <div class="js-enroll-anon anon-enroll">
   <h3 class="anon-enroll__heading">Ready to begin?</h3>
   <p class="anon-enroll__intro">
@@ -20,6 +27,7 @@
   </a>
 </div>
 
+<!-- Shown only when a logged-in learner cannot start or buy this course. -->
 <div class="js-entitlement-gate entitlement-gate">
   <h3 class="entitlement-gate__heading">Exclusive Learning Membership Access</h3>
   <p class="entitlement-gate__body">

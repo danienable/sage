@@ -1,4 +1,9 @@
+/*
+  Site-wide. Included in dist/tracking-scripts.html, which is pasted in the footer.
+  Labels each lesson in the course menu with its type so the stylesheet can show the right icon.
+*/
 (function () {
+  /* Writes the lesson type onto each row in the course menu. */
   function stampPageTypes() {
     if (!window.Ember || !Ember.View || !Ember.View.views) return;
 
@@ -18,5 +23,6 @@
     }
   }
 
+  /* The course menu updates while someone moves through the course, so keep labeling rows. */
   setInterval(stampPageTypes, 500);
 })();

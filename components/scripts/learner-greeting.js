@@ -1,4 +1,12 @@
+/*
+  Learner dashboard welcome banner. Used on /learn/dashboard.
+  Paste with components/learner-greeting.html. Both dashboard scripts are
+  combined in dist/learner-dashboard-script.html.
+  Places the banner under the teal entitlement bar, then fills the first name
+  and the sentence that matches the learner's language.
+*/
 (function () {
+  /* Prefer the record that actually has a first name. */
   function currentUser() {
     try {
       var conf = window.CONF || {};
@@ -17,11 +25,13 @@
     }
   }
 
+  /* First name only. "Welcome" and the punctuation stay in the HTML. */
   function firstName(user) {
     if (!user || user.firstName == null) return "";
     return String(user.firstName).replace(/^\s+|\s+$/g, "");
   }
 
+  /* Turns a language tag such as fr-ca or de-DE into one of our template languages. */
   function mapLang(lang) {
     if (!lang) return null;
     var l = String(lang).toLowerCase().replace("_", "-");
@@ -34,6 +44,7 @@
     return null;
   }
 
+  /* Reads one cookie. Used only if the profile has no language saved. */
   function cookieValue(name) {
     var parts = document.cookie ? document.cookie.split(";") : [];
     for (var i = 0; i < parts.length; i++) {
@@ -48,6 +59,7 @@
     return "";
   }
 
+  /* Language the learner chose, before we look at the browser. */
   function selectedLang() {
     try {
       var conf = window.CONF || {};
@@ -63,6 +75,7 @@
     return cookieValue("lang") || cookieValue("locale") || cookieValue("language") || "";
   }
 
+  /* Chosen language first, then the browser language, then English. */
   function detectLang() {
     var selected = mapLang(selectedLang());
     if (selected) return selected;
@@ -77,10 +90,12 @@
     return "en";
   }
 
+  /* The banner markup from learner-greeting.html. */
   function greeting() {
     return document.querySelector(".learner-greeting");
   }
 
+  /* The hidden translation for one piece, such as the question or a button. */
   function partTemplate(live, part) {
     var lang = detectLang();
     var node =
@@ -89,6 +104,7 @@
     return node ? String(node.textContent || "").replace(/^\s+|\s+$/g, "") : "";
   }
 
+  /* Sit under the entitlement bar when it is on the page, otherwise under the header. */
   function findMount() {
     var ack = document.querySelector(".entitlement-ack");
     if (ack && ack.parentNode) return { node: ack, where: "afterend" };
@@ -106,17 +122,20 @@
     return null;
   }
 
+  /* True when the banner is already in the right spot. */
   function isPlaced(live, mount) {
     if (!live || !live.parentNode) return false;
     if (mount.where === "afterend") return live.previousElementSibling === mount.node;
     return live.nextElementSibling === mount.node;
   }
 
+  /* Replaces visible text only when the translation is different. */
   function setText(node, text) {
     if (!node || !text || node.textContent === text) return;
     node.textContent = text;
   }
 
+  /* Applies the translated lines and the learner's first name. */
   function fill(live, name) {
     var hello = live.querySelector(".learner-greeting__hello");
     setText(hello, partTemplate(live, "hello"));
@@ -144,6 +163,7 @@
     return !!name && !!nameEl && nameEl.textContent.indexOf(name) !== -1;
   }
 
+  /* Places the banner and fills it. Returns true once the name is showing. */
   function apply() {
     var live = greeting();
     var mount = findMount();
@@ -156,6 +176,7 @@
     return fill(live, firstName(currentUser()));
   }
 
+  /* The dashboard redraws itself, so keep the name and language filled in for a while. */
   var tries = 0;
   var timer = setInterval(function () {
     tries += 1;

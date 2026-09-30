@@ -1,4 +1,14 @@
+<!--
+  Welcome banner for the learner dashboard (/learn/dashboard).
+  Paste this HTML on that page, together with components/entitlement-ack.html
+  and dist/learner-dashboard-script.html.
+  The hidden lines below are the translations. Edit those to change the words.
+  data-lang is the language. data-part is which line: hello, prompt, lead, or a button.
+  The block under that is what people see before the script runs, in English.
+  The empty name spot is filled with the learner's first name. Do not type a name there.
+-->
 <section class="learner-greeting" aria-label="Welcome">
+  <!-- Translations. Hidden on the page. The script copies the matching language into the banner. -->
   <div class="learner-greeting__templates">
     <p data-lang="en" data-part="hello">Welcome</p>
     <p data-lang="en" data-part="prompt">What would you like to do today?</p>

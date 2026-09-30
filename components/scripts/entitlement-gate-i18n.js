@@ -1,4 +1,10 @@
+/*
+  Site-wide. Included in dist/tracking-scripts.html, which is pasted in the footer.
+  Translates the membership-only course message (components/sidebars.html) to match the browser language.
+  Edit the sentences in the list below.
+*/
 (function () {
+  /* One set of membership-message sentences per language. */
   var strings = {
     en: {
       heading: "Exclusive Learning Membership Access",
@@ -44,6 +50,7 @@
     }
   };
 
+  /* Turns a browser language tag into one of the sets above. */
   function mapLang(lang) {
     if (!lang) return null;
     var l = String(lang).toLowerCase().replace("_", "-");
@@ -56,6 +63,7 @@
     return null;
   }
 
+  /* Uses the browser language, then English. */
   function detectLang() {
     var list =
       navigator.languages && navigator.languages.length
@@ -68,10 +76,12 @@
     return "en";
   }
 
+  /* Replaces a line only when the translation is different. */
   function setText(el, value) {
     if (el && value != null && el.textContent !== value) el.textContent = value;
   }
 
+  /* Writes the translated membership message, if that block is on the page. */
   function apply() {
     var root = document.querySelector(".entitlement-gate");
     if (!root) return false;
@@ -84,6 +94,7 @@
     return true;
   }
 
+  /* Course pages change without a full reload, so keep the translation applied. */
   setInterval(apply, 500);
   apply();
 })();

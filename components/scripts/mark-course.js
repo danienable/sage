@@ -1,4 +1,10 @@
+/*
+  Site-wide. Included in dist/tracking-scripts.html, which is pasted in the footer.
+  On a course page, decides whether to show the normal enroll button or the membership-only message.
+  Logged-out visitors see the log-on sidebar instead. Logged-in visitors with access see Enroll or Start.
+*/
 (function () {
+  /* The Thought Industries record attached to a piece of the page. */
   function getView(el) {
     if (!el || !window.Ember || !Ember.View || !Ember.View.views) return null;
     var node = el;
@@ -10,6 +16,7 @@
     return inner && Ember.View.views[inner.id] ? Ember.View.views[inner.id] : null;
   }
 
+  /* Reads the first yes/no answer Thought Industries will give us. */
   function read(view, keys) {
     if (!view || !view.get) return null;
     for (var i = 0; i < keys.length; i++) {
@@ -21,12 +28,14 @@
     return null;
   }
 
+  /* Shows or hides every matching block. */
   function setDisplay(els, show) {
     for (var i = 0; i < els.length; i++) {
       els[i].style.setProperty("display", show ? "block" : "none", "important");
     }
   }
 
+  /* Shows the membership message only when the person is logged in, the course is ready, and they cannot buy or start it. */
   function markCourse() {
     var root = document.documentElement;
     var loggedIn = root.classList.contains("is-logged-in");
