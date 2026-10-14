@@ -1,0 +1,81 @@
+<!--
+  Log-on popup for a Panorama dashboard.
+  Paste dist/logon-message.html into a Custom HTML object on that dashboard.
+  Also paste styles/custom-code.css into the site custom CSS.
+
+  Each card is one message. The script shows the first card this learner matches
+  that still has visits left and has not passed its end date.
+  Closing the card hides it for this visit. It can come back on a later visit.
+
+  data-id is this card's name. Change it when the visit count should start over.
+  data-sublicenses is license ids, separated by commas. Leave it empty to ignore products.
+  data-countries is countries, separated by commas. Leave it empty to ignore country.
+  Write every form the profile might use, such as South Africa,ZA.
+  A card with both must match both. A card with neither stays hidden.
+  data-max-shows is how many visits may show this card. If you leave it off, it shows once.
+  data-expires is the last day it may appear, as YYYY-MM-DD. Leave it off for no end date.
+  data-variant is notice or glow.
+  The button address is the link href. Leave it empty and the button stays hidden.
+
+  If country is stored under a different profile field, add data-country-field
+  on the outer logon-messages block with that field name.
+-->
+<div class="logon-messages" hidden>
+  <article
+    class="logon-message"
+    data-id="sa-payroll-2026"
+    data-variant="notice"
+    data-sublicenses=""
+    data-countries="South Africa,ZA"
+    data-max-shows="3"
+    data-expires="2026-12-31"
+  >
+    <button
+      type="button"
+      class="logon-message__dismiss"
+      aria-label="Close"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+    <p class="logon-message__brand">
+      <span class="logon-message__sage">Sage</span>
+      <span class="logon-message__divider" aria-hidden="true"></span>
+      <span class="logon-message__university">University</span>
+    </p>
+    <h2 class="logon-message__title">
+      <span class="logon-message__line">2026 Annual Payroll Tax</span>
+      <span class="logon-message__line">Update Webinar</span>
+    </h2>
+    <p class="logon-message__subtitle">(South African Legislation Only)</p>
+    <p class="logon-message__body">
+      The final changes to the payroll-related tax laws for the new tax year have been issued for implementation on 1 March 2026. Join us for a morning session with Rob Cooper to get up to date and understand how payroll tax changes will affect your company.
+    </p>
+  </article>
+
+  <article
+    class="logon-message"
+    data-id="hpa-assessment"
+    data-variant="glow"
+    data-sublicenses="REPLACE_WITH_MEMBERSHIP_LICENSE_ID"
+    data-countries=""
+    data-max-shows="3"
+    data-expires="2026-12-31"
+  >
+    <button
+      type="button"
+      class="logon-message__dismiss"
+      aria-label="Close"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+    <p class="logon-message__eyebrow">High-Performance Academy</p>
+    <h2 class="logon-message__headline">
+      <span class="logon-message__line">Assess your potential.</span>
+      <span class="logon-message__line">Accelerate your progress.</span>
+    </h2>
+    <p class="logon-message__body">
+      Take the 5-minute assessment and get a personalized report showing how you measure up across five high-performance competencies, and unlock CPE-accredited training tailored to you.
+    </p>
+    <a class="logon-message__cta" href="">Take the assessment</a>
+  </article>
+</div>
